@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#ffffff"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#0b0f14"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <title>Lehrlingsfahrten MurtalTaxi</title>
+
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./assets/favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./assets/favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="./assets/favicon/site.webmanifest" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Variable font: один запрос, веса 400–900 -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preload" href="./assets/css/theme.css" as="style" />
+    <link rel="stylesheet" href="./assets/css/theme.css" />
+    <link rel="stylesheet" href="./assets/css/global.css" />
+    <link rel="stylesheet" href="./assets/css/layout.css" />
+    <link rel="stylesheet" href="./assets/css/components.css" />
+    <link rel="stylesheet" href="./assets/css/responsive.css" />
+  </head>
+  <body>
+    <main class="page">
+      <div class="container page__grid">
+        <!-- ЛЕВАЯ КОЛОНКА (ASIDE) -->
+        <aside class="aside">
+          <!-- Панель фильтров/переключателей -->
+          <section class="panel">
+            <div class="rowHead">
+              <div class="seg" aria-label="Route wählen">
+                <button id="seg1" type="button" aria-pressed="true">
+                  Route 1
+                </button>
+                <button id="seg2" type="button" aria-pressed="false">
+                  Route 2
+                </button>
+              </div>
+              <div id="now" aria-live="off"></div>
+            </div>
+
+            <div class="filters">
+              <div class="ctrl">
+                <label for="driver">Fahrer</label>
+                <select id="driver">
+                  <option value="">—</option>
+                </select>
+              </div>
+
+              <div class="ctrl">
+                <label for="reportDate">Datum</label>
+                <input id="reportDate" type="date" />
+              </div>
+
+              <div class="ctrl">
+                <label for="shift">Zeit</label>
+                <select id="shift">
+                  <option value="Früh">Früh</option>
+                  <option value="Nachmittag">Nachmittag</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn" id="selectAll">Alle auswählen</button>
+              <button class="btn" id="clearAll">Alle abwählen</button>
+            </div>
+          </section>
+
+          <!-- «Bottom» ПОД панелью (больше не fixed) -->
+          <div class="bottom as-block">
+            <div class="bottom__inner">
+              <div>
+                <div class="meta">Gesamtstrecke</div>
+                <div class="total"><span id="total">0</span> km</div>
+              </div>
+              <button
+                id="theme-toggle"
+                class="theme-btn"
+                type="button"
+                aria-label="Thema wechseln"
+                aria-pressed="false"
+              >
+                🌙
+              </button>
+              <button class="save" id="save">Speichern</button>
+            </div>
+          </div>
+
+          <!-- Подтверждение и последние отправки (останутся слева) -->
+          <section
+            id="confirm"
+            class="sidebar__box"
+            aria-label="Bestätigung"
+          ></section>
+          <section
+            id="recent"
+            class="sidebar__box"
+            style="display: none"
+            aria-label="Letzte Sendungen"
+          ></section>
+        </aside>
+
+        <!-- ПРАВАЯ КОЛОНКА (СПИСОК) -->
+        <section id="list" role="list" aria-live="polite">
+          <select id="driver">
+            <option value="">Wird geladen…</option>
+          </select>
+        </section>
+      </div>
+    </main>
+
+    <script src="./assets/js/api.js" defer></script>
+    <script src="./assets/js/function.js" defer></script>
+    <script src="./assets/js/main.js" defer></script>
+  </body>
+</html>

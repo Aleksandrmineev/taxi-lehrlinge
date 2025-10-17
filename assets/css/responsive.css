@@ -1,0 +1,123 @@
+@media (min-width: 992px) {
+  :root {
+    --fs-base: 18px;
+    --fs-small: 15px;
+    --fs-h1: 24px;
+    --fs-total: 32px;
+
+    --rad: 20px;
+    --pad: 16px;
+    --gap: 16px;
+  }
+
+  .page__grid {
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+    padding: 20px;
+  }
+}
+
+/* Мобайл/планшет: одна колонка, bottom снова фиксируем (как раньше) */
+@media (max-width: 900px) {
+  .page__grid {
+    grid-template-columns: 1fr;
+  }
+  .aside {
+    position: static;
+  }
+
+  /* вернуть fixed-бар на узких экранах */
+  .bottom.as-block {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    background: var(--surface-1);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -10px 34px rgba(0, 0, 0, 0.35);
+    padding: clamp(12px, 4vw, 18px) clamp(12px, 4vw, 18px)
+      max(12px, env(safe-area-inset-bottom));
+  }
+  .bottom__inner {
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 0;
+  }
+
+  /* отступ снизу под фиксированный бар */
+  html,
+  body {
+    scroll-padding-bottom: 120px;
+  }
+}
+
+/* Большие экраны — шире правую колонку */
+@media (min-width: 1280px) {
+  .page__grid {
+    grid-template-columns: 380px 1fr;
+  }
+}
+
+/* Десктопные размеры шрифтов/контролов (как делали раньше) */
+@media (min-width: 1024px) {
+  :root {
+    --fs-base: 18px;
+    --fs-small: 14px;
+    --fs-big: 24px;
+    --pad: 16px;
+  }
+  .seg button {
+    padding: 8px 16px;
+  }
+  select,
+  input[type="date"] {
+    padding: 12px 12px;
+    border-radius: 12px;
+  }
+  .row {
+    grid-template-columns: 32px 72px 1fr auto;
+    padding: 12px;
+  }
+  .chk {
+    width: 22px;
+    height: 22px;
+  }
+  .badge {
+    min-width: 56px;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 900px) {
+  .panel .filters {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .panel .actions {
+    grid-template-columns: 1fr 1fr;
+  } /* остаётся 2 в ряд */
+  .save {
+    font-size: 18px;
+    padding: 14px 0;
+  }
+  .total {
+    font-size: 24px;
+  }
+}
+
+/* инпуты/селекты на десктопе компактнее */
+@media (min-width: 1024px) {
+  select,
+  input[type="date"] {
+    padding: 12px 12px;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+  .ctrl label {
+    font-size: 13px;
+  } /* на случай если где-то оставим видимый label */
+}

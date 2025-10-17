@@ -1,0 +1,173 @@
+:root {
+  /* базовый мобильный размер интерфейса */
+  --fs-base: 16px;
+  --fs-small: 14px;
+  --fs-h1: 20px; /* заголовок в панелях */
+  --fs-total: 28px;
+
+  --rad: 14px;
+  --pad: 12px;
+  --gap: 10px;
+}
+
+html {
+  font-size: 16px;
+}
+body {
+  line-height: 1.45;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-main);
+  font-size: var(--fs-base);
+  padding-bottom: var(--footer-safe);
+  transition: background-color var(--tr-fast), color var(--tr-fast);
+  font-variant-numeric: proportional-nums;
+}
+.total,
+.badge,
+.kv,
+.seq {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== LAYOUT / TOPBAR ===== */
+#confirm .card {
+  margin-bottom: 12px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--bg) 96%, transparent),
+    color-mix(in oklab, var(--bg) 88%, transparent)
+  );
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: var(--pad);
+  border-bottom: 1px solid var(--line);
+}
+
+.rowHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.seg {
+  display: inline-flex;
+  gap: 12px;
+  background: color-mix(in oklab, var(--surface-2) 60%, transparent);
+  padding: 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+.seg button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--fs-base);
+  font-weight: 800;
+  padding: 10px 22px;
+  border-radius: 999px;
+  transition: color var(--tr-fast), background-color var(--tr-fast);
+}
+.seg button[aria-pressed="true"] {
+  background: var(--surface-1);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+#now {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+/* ===== FILTERS & CONTROLS GRID ===== */
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* ===== ACTIONS ===== */
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* ===== LIST WRAPPER ===== */
+#list {
+  padding: var(--pad);
+  display: grid;
+  gap: clamp(12px, 1vw, 12px);
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: var(--footer-safe);
+}
+
+/* ===== BOTTOM BAR / TOTAL ===== */
+.bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  background: var(--surface-1);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -10px 34px rgba(0, 0, 0, 0.35);
+  padding: clamp(16px, 4vw, 22px) clamp(16px, 4vw, 22px)
+    max(14px, env(safe-area-inset-bottom));
+  /* display: grid;
+  grid-template-columns: 1fr auto minmax(200px, 260px); */
+  align-items: center;
+  gap: 16px;
+  transition: background-color var(--tr-fast), border-color var(--tr-fast),
+    color var(--tr-fast);
+}
+
+/* слойность поверх футера */
+#confirm,
+#recent {
+  position: relative;
+  z-index: 2;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  clip-path: inset(50%) !important;
+  height: 1px !important;
+  width: 1px !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: -1px !important;
+}
+
+/* DnD стабильность */
+.row .badge {
+  touch-action: none; /* запрет жестов прокрутки/зума на бейдже */
+  user-select: none; /* запрет выделения текста */
+  cursor: grab;
+}
+.row.drag .badge {
+  cursor: grabbing;
+}
