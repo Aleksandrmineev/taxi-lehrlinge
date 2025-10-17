@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Hilfe · Lehrlingsfahrten MurtalTaxi</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./assets/css/theme.css" />
+    <link rel="stylesheet" href="./assets/css/global.css" />
+    <link rel="stylesheet" href="./assets/css/layout.css" />
+    <link rel="stylesheet" href="./assets/css/components.css" />
+    <link rel="stylesheet" href="./assets/css/responsive.css" />
+  </head>
+  <body>
+    <main>
+      <div class="container" style="max-width: 860px">
+        <h1 style="margin: 0 0 8px">Hilfe</h1>
+        <p class="muted" style="margin: 0 0 24px">
+          Kurzbeschreibung der Anwendung
+        </p>
+        <a
+          class="btn-link"
+          href="./index.html"
+          aria-label="Zurück zur Anwendung"
+        >
+          ⟵ Zurück
+        </a>
+        <section class="card" style="padding: 16px">
+          <h2 style="margin-top: 0">Was macht die App?</h2>
+          <p>
+            Ein schlankes Web-Interface zur Erfassung täglicher
+            <b>Lehrlings-Fahrten</b>. Daten (Punkte, Distanzen, Fahrer) kommen
+            per JSON von einem Google Apps Script (GAS) und werden dort
+            gespeichert.
+          </p>
+
+          <h3>Bedienung</h3>
+          <ul>
+            <li>
+              <b>Route wählen:</b> Route&nbsp;1/2 in der linken Spalte
+              umschalten.
+            </li>
+            <li>
+              <b>Reihenfolge &amp; Auswahl:</b> Punkte per Drag&amp;Drop
+              sortieren, mit Checkbox aktivieren/deaktivieren. Die Gesamtdistanz
+              aktualisiert sich automatisch.
+            </li>
+            <li>
+              <b>Fahrer/Datum/Schicht:</b> links oben auswählen. Das Datum ist
+              automatisch heute.
+            </li>
+            <li>
+              <b>Speichern:</b> Button <i>Speichern</i> sendet die Daten an den
+              GAS-Server. Eine Bestätigung erscheint links im Infofeld.
+            </li>
+            <li>
+              <b>Darstellung:</b> Hell/Dunkel-Modus über den
+              Mond-/Sonnen-Button.
+            </li>
+          </ul>
+
+          <h3>Technik</h3>
+          <ul>
+            <li>Frontend: HTML/CSS/Vanilla JS</li>
+            <li>Backend: Google Apps Script (Web-App Endpoint)</li>
+            <li>
+              Hauptdateien: <code>api.js</code>, <code>function.js</code>,
+              <code>main.js</code>
+            </li>
+          </ul>
+
+          <hr
+            style="
+              border: none;
+              border-top: 1px solid var(--line, #2a3342);
+              margin: 16px 0;
+            "
+          />
+
+          <p style="margin: 0">
+            <b>Entwicklung:</b>
+            <a href="https://t.me/aamineev" target="_blank" rel="noopener"
+              >@aamineev</a
+            >
+          </p>
+        </section>
+
+        <p style="margin: 16px 0 0">
+          <a
+            class="btn-link"
+            href="./index.html"
+            aria-label="Zurück zur Anwendung"
+          >
+            ⟵ Zurück
+          </a>
+        </p>
+      </div>
+    </main>
+    <script src="./assets/js/theme.js" defer></script>
+  </body>
+</html>

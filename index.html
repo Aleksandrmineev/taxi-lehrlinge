@@ -94,8 +94,47 @@
             </div>
 
             <div class="actions">
-              <button class="btn" id="selectAll">Alle auswählen</button>
-              <button class="btn" id="clearAll">Alle abwählen</button>
+              <button
+                class="btn icon-btn"
+                id="selectAll"
+                aria-label="Alle auswählen"
+                title="Alle auswählen"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="9 11 12 14 22 4" />
+                  <path d="M21 21H3V3" />
+                </svg>
+              </button>
+
+              <button
+                class="btn icon-btn"
+                id="clearAll"
+                aria-label="Alle abwählen"
+                title="Alle abwählen"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
             </div>
           </section>
 
@@ -106,6 +145,33 @@
                 <div class="meta">Gesamtstrecke</div>
                 <div class="total"><span id="total">0</span> km</div>
               </div>
+
+              <button class="save" id="save">Speichern</button>
+            </div>
+
+            <!-- новая строка ссылок -->
+            <div class="bottom__links">
+              <a
+                href="hilfe.html"
+                class="btn-link"
+                aria-label="Hilfeseite öffnen"
+              >
+                <svg
+                  class="btn-link__icon"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm.25 17a1.25 1.25 0 1 1 1.25-1.25A1.25 1.25 0 0 1 12.25 19ZM13.5 13a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1-.75-.75v-.5a2.5 2.5 0 0 1 2.5-2.5 1.5 1.5 0 1 0-1.5-1.5.75.75 0 0 1-1.5 0 3 3 0 1 1 3.75 2.9Z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Hilfe
+              </a>
+
+              <!-- оригинальный переключатель темы — без изменений -->
               <button
                 id="theme-toggle"
                 class="theme-btn"
@@ -115,7 +181,28 @@
               >
                 🌙
               </button>
-              <button class="save" id="save">Speichern</button>
+
+              <a
+                href="https://t.me/aamineev"
+                target="_blank"
+                rel="noopener"
+                class="btn-link btn-link--dev"
+                aria-label="Schreiben in Telegram @aamineev"
+              >
+                <svg
+                  class="btn-link__icon tg-icon"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M9.7 14.7l-.3 4.6c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.7.4 1.2.2 1.4-.6l2.6-12.2c.2-.9-.3-1.3-1-1.1L4 10.3c-.8.2-.8.7-.1.9l4.3 1.3 10-6.3c.5-.3.9-.1.5.2l-9 8.3z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Entwicklung
+              </a>
             </div>
           </div>
 
@@ -142,6 +229,7 @@
       </div>
     </main>
 
+    <script src="./assets/js/theme.js" defer></script>
     <script src="./assets/js/api.js" defer></script>
     <script src="./assets/js/function.js" defer></script>
     <script src="./assets/js/main.js" defer></script>

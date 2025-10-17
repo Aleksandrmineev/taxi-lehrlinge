@@ -30,15 +30,14 @@ document.addEventListener("DOMContentLoaded", () => {
     saveBtn: document.getElementById("save"),
     nowEl: document.getElementById("now"),
     confirmBox: document.getElementById("confirm"),
-    // recentBox: удалён
     dateEl: document.getElementById("reportDate"),
-    themeBtn: document.getElementById("theme-toggle"),
     btnSelectAll: document.getElementById("selectAll"),
     btnClearAll: document.getElementById("clearAll"),
+    // НЕТ themeBtn — темой управляет только theme.js
   };
 
   // ========== Базовая инициализация UI ==========
-  if (typeof App.initThemeToggle === "function") App.initThemeToggle();
+  // НЕТ App.initThemeToggle() — темой управляет только theme.js
   if (typeof App.setReportDateToday === "function") App.setReportDateToday();
 
   // Часы: тикаем только на видимой вкладке
@@ -104,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-  // ========== Загрузка данных (Только getData) ==========
+  // ========== Загрузка данных (только getData) ==========
   async function load(r) {
     const route = String(r || "1");
     App.state.route = route;
@@ -117,8 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const res = await window.loadData(route); // из api.js
 
-      // устаревший ответ — выходим
-      if (myToken !== _loadToken) return;
+      if (myToken !== _loadToken) return; // устаревший ответ
 
       // Приводим state
       const points = Array.isArray(res?.points) ? res.points : [];
@@ -132,11 +130,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Рендерим
       if (typeof App.renderDrivers === "function") App.renderDrivers();
       if (typeof App.render === "function") App.render();
-
-      // Больше ничего: recent отключён полностью
     } catch (err) {
       console.error("load() error:", err);
-      // компактное уведомление в confirm-box
       const box = App.dom.confirmBox;
       const msg = err && err.message ? err.message : String(err);
       if (box) {
@@ -203,8 +198,6 @@ document.addEventListener("DOMContentLoaded", () => {
             sequence: Array.isArray(seq) ? seq.join(">") : String(seq || ""),
           });
         }
-
-        // НЕ обновляем recent — он отключён
       } catch (e) {
         console.error("SUBMIT FAIL:", e);
         btn.textContent = prevText;

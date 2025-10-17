@@ -31,7 +31,7 @@ input[type="date"]:focus {
 /* ===== GENERIC BUTTON ===== */
 .btn {
   flex: 1;
-  min-width: 200px;
+  /* min-width: 200px; */
   appearance: none;
   border: 1px solid var(--line);
   background: var(--surface-2);
@@ -60,6 +60,7 @@ input[type="date"]:focus {
   display: grid;
   grid-template-columns: 30px 50px 0.8fr auto;
   align-items: center;
+  max-width: 95vw;
   gap: 10px;
   padding: clamp(8px, 2.2vw, 12px);
   background: var(--surface-1);
@@ -202,13 +203,12 @@ input[type="date"]:focus {
 
 /* ===== Theme toggle button ===== */
 .theme-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  padding: 6px 11px;
+  border-radius: var(--radius);
   border: 1px solid var(--line);
   background: var(--surface-2);
   color: var(--text);
-  font-size: 24px;
+  font-size: var(--fs-base);
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -249,11 +249,6 @@ input[type="date"]:focus {
   border-radius: 10px;
   font-size: 16px; /* было крупнее */
   font-weight: 800; /* вместо 900, Montserrat и так плотный */
-}
-.theme-btn {
-  width: 42px;
-  height: 42px;
-  font-size: 20px;
 }
 
 .panel {
@@ -325,19 +320,14 @@ input[type="date"]:focus {
 }
 
 .bottom .bottom__inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 12px;
   align-items: center;
 }
 .total {
   font-size: var(--fs-total);
-}
-
-.theme-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
 }
 
 .save {
@@ -348,10 +338,6 @@ input[type="date"]:focus {
 }
 
 @media (min-width: 992px) {
-  .bottom .bottom__inner {
-    grid-template-columns: 1fr auto auto; /* как на десктопе */
-    gap: 16px;
-  }
   .save {
     width: auto;
     padding: 0 18px;
@@ -398,9 +384,4 @@ input[type="date"]:focus {
     width: 20px;
     height: 20px;
   }
-}
-
-.sidebar__box {
-  padding: var(--pad);
-  border-radius: var(--rad);
 }

@@ -3,7 +3,7 @@
   --fs-base: 16px;
   --fs-small: 14px;
   --fs-h1: 20px; /* заголовок в панелях */
-  --fs-total: 28px;
+  --fs-total: 20px;
 
   --rad: 14px;
   --pad: 12px;
@@ -67,7 +67,10 @@ body {
 }
 
 .seg {
-  display: inline-flex;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   gap: 12px;
   background: color-mix(in oklab, var(--surface-2) 60%, transparent);
   padding: 8px;

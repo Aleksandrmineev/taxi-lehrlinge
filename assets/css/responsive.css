@@ -3,7 +3,7 @@
     --fs-base: 18px;
     --fs-small: 15px;
     --fs-h1: 24px;
-    --fs-total: 32px;
+    --fs-total: 24px;
 
     --rad: 20px;
     --pad: 16px;
@@ -11,7 +11,7 @@
   }
 
   .page__grid {
-    grid-template-columns: 380px 1fr;
+    grid-template-columns: 0.3fr 0.7fr;
     gap: 24px;
     padding: 20px;
   }
@@ -19,13 +19,6 @@
 
 /* Мобайл/планшет: одна колонка, bottom снова фиксируем (как раньше) */
 @media (max-width: 900px) {
-  .page__grid {
-    grid-template-columns: 1fr;
-  }
-  .aside {
-    position: static;
-  }
-
   /* вернуть fixed-бар на узких экранах */
   .bottom.as-block {
     position: fixed;
@@ -53,13 +46,6 @@
   html,
   body {
     scroll-padding-bottom: 120px;
-  }
-}
-
-/* Большие экраны — шире правую колонку */
-@media (min-width: 1280px) {
-  .page__grid {
-    grid-template-columns: 380px 1fr;
   }
 }
 
@@ -95,7 +81,10 @@
 
 @media (max-width: 900px) {
   .panel .filters {
-    grid-template-columns: 1fr 1fr 1fr;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
   }
   .panel .actions {
     grid-template-columns: 1fr 1fr;
@@ -103,9 +92,6 @@
   .save {
     font-size: 18px;
     padding: 14px 0;
-  }
-  .total {
-    font-size: 24px;
   }
 }
 
