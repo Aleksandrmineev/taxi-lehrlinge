@@ -22,60 +22,91 @@
     <link rel="stylesheet" href="./assets/css/responsive.css" />
   </head>
   <body>
-    <main>
+    <main class="page">
       <div class="container" style="max-width: 860px">
-        <h1 style="margin: 0 0 8px">Hilfe</h1>
-        <p class="muted" style="margin: 0 0 24px">
-          Kurzbeschreibung der Anwendung
-        </p>
-        <a
-          class="btn-link"
-          href="./index.html"
-          aria-label="Zurück zur Anwendung"
+        <!-- ======= MOBILE HEADER ======= -->
+        <header
+          class="page__header"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+          "
         >
-          ⟵ Zurück
-        </a>
+          <h1 style="margin: 0; font-size: clamp(20px, 5vw, 26px)">Hilfe</h1>
+          <nav
+            class="help__nav"
+            style="
+              display: flex;
+              gap: 12px;
+              align-items: center;
+              flex-wrap: wrap;
+            "
+          >
+            <a
+              href="./index.html"
+              class="btn-link"
+              aria-label="Zurück zur Anwendung"
+              >🏠 Start</a
+            >
+            <a
+              href="./recent.html"
+              class="btn-link"
+              aria-label="Letzte Berichte anzeigen"
+              >🗂 Berichte</a
+            >
+          </nav>
+        </header>
+
+        <!-- ======= INHALT ======= -->
         <section class="card" style="padding: 16px">
           <h2 style="margin-top: 0">Was macht die App?</h2>
           <p>
-            Ein schlankes Web-Interface zur Erfassung täglicher
-            <b>Lehrlings-Fahrten</b>. Daten (Punkte, Distanzen, Fahrer) kommen
-            per JSON von einem Google Apps Script (GAS) und werden dort
+            Die Anwendung dient zur einfachen Erfassung täglicher
+            <b>Lehrlings-Fahrten</b>. Fahrer wählen Route, Punkte und Schicht,
+            die Daten werden automatisch an den Server übertragen und
             gespeichert.
           </p>
 
           <h3>Bedienung</h3>
           <ul>
+            <li><b>Route wählen:</b> Oben zwischen Route 1 / 2 umschalten.</li>
             <li>
-              <b>Route wählen:</b> Route&nbsp;1/2 in der linken Spalte
-              umschalten.
+              <b>Punkte sortieren:</b> Per Drag &amp; Drop ordnen, aktivieren
+              oder deaktivieren.
+            </li>
+            <li><b>Gesamtstrecke:</b> wird automatisch berechnet.</li>
+            <li>
+              <b>Speichern:</b> Button <i>Speichern</i> sendet Daten an den
+              Server.
             </li>
             <li>
-              <b>Reihenfolge &amp; Auswahl:</b> Punkte per Drag&amp;Drop
-              sortieren, mit Checkbox aktivieren/deaktivieren. Die Gesamtdistanz
-              aktualisiert sich automatisch.
+              <b>Berichte:</b> Unter <a href="./recent.html">Berichte</a> sind
+              die letzten Einträge abrufbar.
             </li>
             <li>
-              <b>Fahrer/Datum/Schicht:</b> links oben auswählen. Das Datum ist
-              automatisch heute.
-            </li>
-            <li>
-              <b>Speichern:</b> Button <i>Speichern</i> sendet die Daten an den
-              GAS-Server. Eine Bestätigung erscheint links im Infofeld.
-            </li>
-            <li>
-              <b>Darstellung:</b> Hell/Dunkel-Modus über den
-              Mond-/Sonnen-Button.
+              <b>Darstellung:</b> Hell/Dunkel-Modus über den Button 🌙 / ☀️.
             </li>
           </ul>
 
-          <h3>Technik</h3>
+          <h3>Technik (Kurzinfo)</h3>
           <ul>
-            <li>Frontend: HTML/CSS/Vanilla JS</li>
-            <li>Backend: Google Apps Script (Web-App Endpoint)</li>
+            <li><b>Frontend:</b> HTML / CSS / Vanilla JS</li>
+            <li><b>Backend:</b> Google Apps Script (GAS) mit JSON-API</li>
             <li>
-              Hauptdateien: <code>api.js</code>, <code>function.js</code>,
-              <code>main.js</code>
+              <b>Hauptdateien:</b> <code>api.js</code>, <code>main.js</code>,
+              <code>function.js</code>
+            </li>
+            <li>
+              <b>Endpoints:</b> <code>?fn=getdata</code>,
+              <code>?fn=recent</code>, <code>POST submit</code>
+            </li>
+            <li>
+              <b>Speicherung:</b> Tabelle <code>Submissions</code> (Google
+              Sheets)
             </li>
           </ul>
 
@@ -95,17 +126,21 @@
           </p>
         </section>
 
-        <p style="margin: 16px 0 0">
+        <footer style="margin: 24px 0 0; text-align: center; opacity: 0.8">
           <a
             class="btn-link"
             href="./index.html"
             aria-label="Zurück zur Anwendung"
+            >⟵ Zurück</a
           >
-            ⟵ Zurück
-          </a>
-        </p>
+          ·
+          <a class="btn-link" href="./recent.html" aria-label="Berichte öffnen"
+            >🗂 Berichte</a
+          >
+        </footer>
       </div>
     </main>
+
     <script src="./assets/js/theme.js" defer></script>
   </body>
 </html>
