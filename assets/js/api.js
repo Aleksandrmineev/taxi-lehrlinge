@@ -280,43 +280,20 @@ window.api = { loadData, loadRecent, saveSubmission, ping, cacheInvalidate };
 // ВНИМАНИЕ: добавь это к существующему API-объекту
 window.API = window.API || {};
 
+// ЗАМЕНИТЕ существующую реализацию API.getRecentSubmissions на эту:
+
 API.getRecentSubmissions = async function getRecentSubmissions(params = {}) {
-  const {
-    from = "",
-    to = "",
-    driver = "",
-    shift = "",
-    limit = 50,
-    route = "",
-  } = params;
+  // сервер сейчас не поддерживает from/to/driver/shift — игнорируем их
+  const route = String(params.route || "");
+  const limit = String(params.limit || 50);
 
-  // 1) Среда GAS
-  if (typeof google !== "undefined" && google.script && google.script.run) {
-    return new Promise((resolve, reject) => {
-      try {
-        google.script.run
-          .withSuccessHandler(resolve)
-          .withFailureHandler(reject)
-          .getRecentSubmissions({ from, to, driver, shift, limit, route });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
+  // используем общий cachedGet -> doGet?fn=recent&route=&limit=
+  const resp = await cachedGet({ fn: "recent", route, limit }, TTL.recent, {
+    retries: 0,
+    timeoutMs: 6000,
+    swr: true,
+  });
 
-  // 2) Статика: правильный эндпоинт — fn=recent
-  const resp = await apiGet(
-    {
-      fn: "recent",
-      from,
-      to,
-      driver,
-      shift,
-      limit: String(limit),
-      route: String(route),
-    },
-    { retries: 0, timeoutMs: 8000 }
-  );
   return Array.isArray(resp?.items) ? resp.items : [];
 };
 

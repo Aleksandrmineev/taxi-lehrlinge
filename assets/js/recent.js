@@ -1,3 +1,4 @@
+// assets/js/recent.js
 document.addEventListener("DOMContentLoaded", async () => {
   const listEl = document.getElementById("list") || document.body;
   const nowEl = document.getElementById("now");
@@ -6,6 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const fLimit = document.getElementById("f_limit");
   const apply = document.getElementById("apply");
 
+  /* ===== часы вверху ===== */
   const fmtNow = () =>
     new Date().toLocaleString("de-AT", {
       dateStyle: "medium",
@@ -14,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   nowEl.textContent = fmtNow();
   setInterval(() => (nowEl.textContent = fmtNow()), 30000);
 
-  // По умолчанию: последние 2 дня (вчера..сегодня)
+  /* ===== по умолчанию: последние 2 дня ===== */
   const today = new Date();
   const yest = new Date(today);
   yest.setDate(today.getDate() - 1);
@@ -25,6 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!fFrom.value) fFrom.value = toISO(yest);
   if (!fTo.value) fTo.value = toISO(today);
 
+  /* ===== хелперы ===== */
   const safeNum = (v) => {
     if (typeof v === "number") return v;
     if (typeof v === "string") return Number(v.replace(",", ".")) || 0;
@@ -42,7 +45,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     d
       ? d.toLocaleString("de-AT", { dateStyle: "medium", timeStyle: "short" })
       : "—";
+  const esc = (s) =>
+    String(s ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
 
+  /* ===== загрузка и рендер ===== */
   async function loadAndRender() {
     listEl.innerHTML = '<p class="meta">Lade…</p>';
     try {
@@ -50,7 +61,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const to = fTo.value || "";
       const limit = Number(fLimit.value) || 50;
 
-      // Получаем СРАЗУ с фильтрами по дате (сервер срежет лишнее)
       const items = await API.getRecentSubmissions({
         from,
         to,
@@ -66,22 +76,30 @@ document.addEventListener("DOMContentLoaded", async () => {
       listEl.innerHTML = items
         .map((r) => {
           const ts = asDate(r.timestamp) || asDate(r.report_date);
-          // На старых строках shift мог быть ISO — маскируем
-          const shift =
-            typeof r.shift === "string" && /T\d{2}:\d{2}/.test(r.shift)
-              ? "—"
-              : r.shift || "—";
           const km = safeNum(r.total_km).toFixed(1);
+
+          // берём текст из колонки E (shift) как есть
+          const shiftText =
+            typeof r.shift === "string" || typeof r.shift === "number"
+              ? String(r.shift).trim()
+              : "";
+          const shiftPart = shiftText ? ` • ${esc(shiftText)}` : "";
+
           return `
             <article class="card" role="listitem" aria-label="Report">
-              <h3>${r.driver_name || "—"} • ${shift} • Route ${
+              <h3>${esc(r.driver_name || "—")} • Route ${esc(
             r.route || "—"
-          }</h3>
+          )}${shiftPart}</h3>
               <div class="meta">${fmtAT(ts)}</div>
-              <div class="row"><span>Gesamtstrecke</span><strong>${km} km</strong></div>
+              <div class="row">
+                <span>Gesamtstrecke</span>
+                <strong>${km} km</strong>
+              </div>
               ${
                 r.sequence_names
-                  ? `<div class="meta" style="margin-top:8px">${r.sequence_names}</div>`
+                  ? `<div class="meta" style="margin-top:8px; white-space:pre-line;">${esc(
+                      r.sequence_names
+                    )}</div>`
                   : ""
               }
             </article>
@@ -96,6 +114,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   apply.addEventListener("click", loadAndRender);
 
-  // Первая загрузка
+  // первая загрузка
   loadAndRender();
 });
