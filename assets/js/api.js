@@ -38,7 +38,7 @@ function isRetriableError(err, status) {
 async function fetchJSON(
   url,
   options = {},
-  { retries = 1, timeoutMs = 8000, backoffBaseMs = 300 } = {}
+  { retries = 2, timeoutMs = 15000, backoffBaseMs = 300 } = {}
 ) {
   let lastErr = null;
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -187,8 +187,8 @@ const TTL = {
 async function loadData(route) {
   const r = String(route || "1");
   const data = await cachedGet({ fn: "getData", route: r }, TTL.getData, {
-    retries: 0,
-    timeoutMs: 8000,
+    retries: 1,
+    timeoutMs: 15000,
     swr: true,
   });
 
@@ -209,8 +209,8 @@ async function loadRecent(route, limit = 4) {
     { fn: "recent", route: r, limit: l },
     TTL.recent,
     {
-      retries: 0,
-      timeoutMs: 6000,
+      retries: 1,
+      timeoutMs: 15000,
       swr: true,
     }
   );
@@ -284,8 +284,8 @@ API.getRecentSubmissions = async function getRecentSubmissions(params = {}) {
   const limit = String(params.limit || 50);
 
   const resp = await cachedGet({ fn: "recent", route, limit }, TTL.recent, {
-    retries: 0,
-    timeoutMs: 6000,
+    retries: 1,
+    timeoutMs: 15000,
     swr: true,
   });
 
