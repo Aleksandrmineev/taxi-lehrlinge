@@ -58,9 +58,9 @@ input[type="date"]:focus {
 /* ===== LIST ROW ===== */
 .row {
   display: grid;
-  grid-template-columns: 30px 50px 0.8fr auto;
+  grid-template-columns: 40px 50px 0.95fr 0.1fr;
   align-items: center;
-  max-width: 95vw;
+  max-width: 100vw;
   gap: 10px;
   padding: clamp(8px, 2.2vw, 12px);
   background: var(--surface-1);
@@ -226,10 +226,15 @@ input[type="date"]:focus {
   display: none !important;
 }
 
+.panel .actions {
+  margin-top: 0;
+}
+
 /* кнопки «Alle …» — немного ниже кегль и высота */
 .panel .actions .btn {
   font-size: 15px;
   padding: 10px 12px;
+  max-width: 50px;
 }
 
 /* блок с итогом — акцентнее */
@@ -365,8 +370,8 @@ input[type="date"]:focus {
 }
 
 #list .chk {
-  width: 18px;
-  height: 18px;
+  width: 35px;
+  height: 35px;
 }
 @media (min-width: 992px) {
   #list .item {

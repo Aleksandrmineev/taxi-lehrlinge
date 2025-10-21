@@ -91,50 +91,50 @@
                   <option value="Nachmittag">Nachmittag</option>
                 </select>
               </div>
-            </div>
 
-            <div class="actions">
-              <button
-                class="btn icon-btn"
-                id="selectAll"
-                aria-label="Alle auswählen"
-                title="Alle auswählen"
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+              <div class="actions">
+                <button
+                  class="btn icon-btn"
+                  id="selectAll"
+                  aria-label="Alle auswählen"
+                  title="Alle auswählen"
                 >
-                  <polyline points="9 11 12 14 22 4" />
-                  <path d="M21 21H3V3" />
-                </svg>
-              </button>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="9 11 12 14 22 4" />
+                    <path d="M21 21H3V3" />
+                  </svg>
+                </button>
 
-              <button
-                class="btn icon-btn"
-                id="clearAll"
-                aria-label="Alle abwählen"
-                title="Alle abwählen"
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                <button
+                  class="btn icon-btn"
+                  id="clearAll"
+                  aria-label="Alle abwählen"
+                  title="Alle abwählen"
                 >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </section>
 
@@ -171,7 +171,29 @@
                 Hilfe
               </a>
 
-              <!-- оригинальный переключатель темы — без изменений -->
+              <!-- ссылка на последние отчёты -->
+              <a
+                href="recent.html"
+                class="btn-link"
+                data-page="recent"
+                aria-label="Letzte Berichte anzeigen"
+              >
+                <svg
+                  class="btn-link__icon"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5zm0 2h14v14H5V5zm3 2v2h8V7H8zm0 4v2h8v-2H8zm0 4v2h5v-2H8z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Berichte
+              </a>
+
+              <!-- переключатель темы -->
               <button
                 id="theme-toggle"
                 class="theme-btn"
@@ -201,7 +223,6 @@
                     fill="currentColor"
                   />
                 </svg>
-                Entwicklung
               </a>
             </div>
           </div>

@@ -276,3 +276,63 @@ window.ping = ping;
 
 // опционально удобно: window.api.*
 window.api = { loadData, loadRecent, saveSubmission, ping, cacheInvalidate };
+
+// ВНИМАНИЕ: добавь это к существующему API-объекту
+window.API = window.API || {};
+
+API.getRecentSubmissions = async function getRecentSubmissions(params = {}) {
+  const {
+    from = "",
+    to = "",
+    driver = "",
+    shift = "",
+    limit = 50,
+    route = "",
+  } = params;
+
+  // 1) Среда GAS
+  if (typeof google !== "undefined" && google.script && google.script.run) {
+    return new Promise((resolve, reject) => {
+      try {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)
+          .getRecentSubmissions({ from, to, driver, shift, limit, route });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  // 2) Статика: правильный эндпоинт — fn=recent
+  const resp = await apiGet(
+    {
+      fn: "recent",
+      from,
+      to,
+      driver,
+      shift,
+      limit: String(limit),
+      route: String(route),
+    },
+    { retries: 0, timeoutMs: 8000 }
+  );
+  return Array.isArray(resp?.items) ? resp.items : [];
+};
+
+// (опционально) список водителей — чтобы заполнить фильтр
+API.getDrivers = async function getDrivers() {
+  if (typeof google !== "undefined" && google.script && google.script.run) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getDrivers();
+    });
+  }
+  const url = (window.GAS_URL || "").trim();
+  if (!url) return [];
+  const res = await fetch(`${url}?fn=getDrivers`);
+  if (!res.ok) return [];
+  return res.json();
+};

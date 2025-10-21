@@ -97,7 +97,7 @@
   gap: 8px;
   padding: 10px 12px;
   border-radius: var(--radius);
-  border: 1px solid var(--line);
+  /* border: 1px solid var(--line); */
   background: var(--surface-1);
   color: var(--text);
   text-decoration: none;
@@ -142,4 +142,13 @@
   .btn-link {
     padding: 6px 11px;
   }
+}
+
+.btn-link.active {
+  color: var(--clr-accent, #0d5ef7);
+  font-weight: 600;
+}
+.btn-link.active .btn-link__icon {
+  color: var(--clr-accent, #0d5ef7);
+  transform: scale(1.1);
 }
