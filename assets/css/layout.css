@@ -20,7 +20,7 @@
   display: grid;
   gap: clamp(12px, 1.5vw, 16px);
   /* position: sticky; */
-  top: 12px;
+  margin-top: 25px;
 }
 
 /* панель (бывший topbar) как карточка */
@@ -56,6 +56,7 @@
   border: 0;
   box-shadow: none;
   padding: 0;
+  margin-top: 10px;
 }
 .bottom__inner {
   display: grid;
