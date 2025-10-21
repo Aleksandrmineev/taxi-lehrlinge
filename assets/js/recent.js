@@ -13,8 +13,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       dateStyle: "medium",
       timeStyle: "short",
     });
-  nowEl.textContent = fmtNow();
-  setInterval(() => (nowEl.textContent = fmtNow()), 30000);
+  if (nowEl) {
+    nowEl.textContent = fmtNow();
+    setInterval(() => (nowEl.textContent = fmtNow()), 30000);
+  }
 
   /* ===== по умолчанию: последние 2 дня ===== */
   const today = new Date();
@@ -78,32 +80,43 @@ document.addEventListener("DOMContentLoaded", async () => {
           const ts = asDate(r.timestamp) || asDate(r.report_date);
           const km = safeNum(r.total_km).toFixed(1);
 
-          // берём текст из колонки E (shift) как есть
+          // shift берем как есть
           const shiftText =
             typeof r.shift === "string" || typeof r.shift === "number"
               ? String(r.shift).trim()
               : "";
           const shiftPart = shiftText ? ` • ${esc(shiftText)}` : "";
 
+          // километры — сразу после shift
+          const kmPart = ` • ${esc(km)} km`;
+
+          // sequence_names: поддерживаем \n и старые разделители (">" и " - ")
+          let seqBlock = "";
+          if (r.sequence_names) {
+            let text = String(r.sequence_names || "").trim();
+            if (!text.includes("\n")) {
+              text = text
+                .split(/>| - /)
+                .map((s) => s.trim())
+                .filter(Boolean)
+                .join("\n");
+            }
+            seqBlock = `<div class="meta" style="margin-top:8px; white-space:pre-line;">${esc(
+              text
+            )}</div>`;
+          }
+
           return `
-            <article class="card" role="listitem" aria-label="Report">
-              <h3>${esc(r.driver_name || "—")} • Route ${esc(
+              <article class="card" role="listitem" aria-label="Report">
+                <h3>${esc(r.driver_name || "—")} • Route ${esc(
             r.route || "—"
-          )}${shiftPart}</h3>
-              <div class="meta">${fmtAT(ts)}</div>
-              <div class="row">
-                <span>Gesamtstrecke</span>
-                <strong>${km} km</strong>
-              </div>
-              ${
-                r.sequence_names
-                  ? `<div class="meta" style="margin-top:8px; white-space:pre-line;">${esc(
-                      r.sequence_names
-                    )}</div>`
-                  : ""
-              }
-            </article>
-          `;
+          )}${shiftPart}${kmPart}</h3>
+                <div class="meta" style="border-bottom:1px solid rgba(0,0,0,0.15);padding-bottom:4px;margin-bottom:8px;">
+  ${fmtAT(ts)}
+</div>
+                ${seqBlock}
+              </article>
+            `;
         })
         .join("");
     } catch (e) {
