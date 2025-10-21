@@ -3,6 +3,7 @@
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbxpGn11PT70usKYe0xE7S28FlwNIrJhXXEzaeK022VPZx7RObBEMvjq4ghpewnRyPGa/exec";
 const API_SECRET = "102030";
+window.GAS_URL = window.GAS_URL || GAS_URL;
 
 /* ----------------------------- Внутренние утилиты ----------------------------- */
 
@@ -22,7 +23,6 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Решаем, стоит ли ретраить ошибку
 function isRetriableError(err, status) {
-  // сетевые/аборты/таймауты
   if (err?.name === "AbortError") return true;
   if (
     err?.message &&
@@ -51,7 +51,7 @@ async function fetchJSON(
         cache: "no-store",
       });
 
-      const text = await res.text(); // ловим HTML-ошибки GAS
+      const text = await res.text();
       let data;
       try {
         data = JSON.parse(text);
@@ -72,7 +72,6 @@ async function fetchJSON(
       lastErr = err;
       const status = err?.status;
       if (attempt === retries || !isRetriableError(err, status)) throw err;
-      // экспоненциальный бэкофф с лёгким джиттером
       const delay = Math.round(
         backoffBaseMs * (attempt + 1) * (1 + Math.random())
       );
@@ -114,13 +113,12 @@ async function apiPost(body, { retries = 1, timeoutMs = 10000 } = {}) {
 
 /* ---------------------- Клиентский кэш + дедупликация ---------------------- */
 
-const _memCache = new Map(); // key -> {ts, ttl, data}
-const _inFlight = new Map(); // key -> Promise
+const _memCache = new Map();
+const _inFlight = new Map();
 
 const isFresh = (entry) => entry && nowMs() - entry.ts < entry.ttl;
 
 /** Возвращает из кэша; если просрочен — ходит в сеть; при swr=true обновляет фоновой перезагрузкой.
- *  Дедупликация: одновременные идентичные запросы ждут один и тот же Promise.
  */
 async function cachedGet(
   params,
@@ -133,7 +131,6 @@ async function cachedGet(
   // fresh → вернуть и (опц.) тихо обновить
   if (isFresh(cached)) {
     if (swr) {
-      // фон, без дедупа — это ok (не критично)
       apiGet(params, { retries, timeoutMs })
         .then((fresh) => {
           _memCache.set(key, { ts: nowMs(), ttl: ttlMs, data: fresh });
@@ -148,7 +145,6 @@ async function cachedGet(
     try {
       return await _inFlight.get(key);
     } finally {
-      // не трогаем кэш: он будет выставлен тем «первым» запросом
     }
   }
 
@@ -173,6 +169,11 @@ function cacheInvalidate(prefixObjOrString) {
     if (k.startsWith(prefix)) _memCache.delete(k);
   }
 }
+function _cacheDeleteByPrefix(prefix) {
+  for (const k of _memCache.keys()) {
+    if (k.startsWith(prefix)) _memCache.delete(k);
+  }
+}
 
 /* ---------------------------- High-level функции --------------------------- */
 
@@ -182,7 +183,6 @@ const TTL = {
 };
 
 /** Загрузка данных для маршрута: points, dist, drivers, pointNameById
- *  GET doGet?fn=getData&route=...
  */
 async function loadData(route) {
   const r = String(route || "1");
@@ -192,7 +192,6 @@ async function loadData(route) {
     swr: true,
   });
 
-  // Префетчим второй маршрут
   const other = r === "1" ? "2" : "1";
   cachedGet({ fn: "getData", route: other }, TTL.getData, {
     retries: 0,
@@ -202,7 +201,6 @@ async function loadData(route) {
 }
 
 /** Последние отправки по маршруту
- *  GET doGet?fn=recent&route=&limit=
  */
 async function loadRecent(route, limit = 4) {
   const r = String(route || "");
@@ -221,7 +219,6 @@ async function loadRecent(route, limit = 4) {
 }
 
 /** Сохранение отчёта (POST doPost submit)
- *  После удачной записи инвалидируем recent для этого маршрута.
  */
 async function saveSubmission(payload) {
   const seq = payload?.sequence || [];
@@ -246,13 +243,18 @@ async function saveSubmission(payload) {
 
   // Инвалидация recent для маршрута (в т.ч. разных лимитов)
   const r = String(payload.route || "");
-  cacheInvalidate(`fn=recent&limit=`); // срежем все recent (на случай разных route/limit)
-  cacheInvalidate(`fn=recent&route=${r}`);
+  for (const k of _memCache.keys()) {
+    if (
+      k.startsWith("fn=recent&") &&
+      k.includes(`&route=${String(payload.route || "")}`)
+    ) {
+      _memCache.delete(k);
+    }
+  }
 
-  return res.saved; // возвращаем полезную часть
+  return res.saved;
 }
 
-/** Keep-alive (необязательно) */
 async function ping() {
   try {
     const ok = await apiGet({ fn: "ping" }, { retries: 0, timeoutMs: 4000 });
@@ -262,7 +264,6 @@ async function ping() {
   }
 }
 
-/* ---- Лёгкий keep-alive раз в 4 минуты ---- */
 setInterval(() => {
   ping().catch(() => {});
 }, 240_000);
@@ -274,20 +275,14 @@ window.loadRecent = loadRecent;
 window.saveSubmission = saveSubmission;
 window.ping = ping;
 
-// опционально удобно: window.api.*
 window.api = { loadData, loadRecent, saveSubmission, ping, cacheInvalidate };
 
-// ВНИМАНИЕ: добавь это к существующему API-объекту
 window.API = window.API || {};
 
-// ЗАМЕНИТЕ существующую реализацию API.getRecentSubmissions на эту:
-
 API.getRecentSubmissions = async function getRecentSubmissions(params = {}) {
-  // сервер сейчас не поддерживает from/to/driver/shift — игнорируем их
   const route = String(params.route || "");
   const limit = String(params.limit || 50);
 
-  // используем общий cachedGet -> doGet?fn=recent&route=&limit=
   const resp = await cachedGet({ fn: "recent", route, limit }, TTL.recent, {
     retries: 0,
     timeoutMs: 6000,
@@ -297,7 +292,6 @@ API.getRecentSubmissions = async function getRecentSubmissions(params = {}) {
   return Array.isArray(resp?.items) ? resp.items : [];
 };
 
-// (опционально) список водителей — чтобы заполнить фильтр
 API.getDrivers = async function getDrivers() {
   if (typeof google !== "undefined" && google.script && google.script.run) {
     return new Promise((resolve, reject) => {
@@ -307,6 +301,7 @@ API.getDrivers = async function getDrivers() {
         .getDrivers();
     });
   }
+
   const url = (window.GAS_URL || "").trim();
   if (!url) return [];
   const res = await fetch(`${url}?fn=getDrivers`);

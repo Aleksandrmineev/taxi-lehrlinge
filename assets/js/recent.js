@@ -55,6 +55,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
 
+  // Универсальная нормализация маршрута (поддержка \n, ">", " - ")
+  function normalizeSeq(v) {
+    if (v == null) return "";
+    const text = String(v).replace(/\r\n?/g, "\n").trim();
+    if (text.includes("\n")) return text; // уже новый формат
+    return text
+      .split(/(?:\s*>\s*|\s*-\s*)+/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join("\n");
+  }
+
   /* ===== загрузка и рендер ===== */
   async function loadAndRender() {
     listEl.innerHTML = '<p class="meta">Lade…</p>';
@@ -76,47 +88,48 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       listEl.innerHTML = items
-        .map((r) => {
-          const ts = asDate(r.timestamp) || asDate(r.report_date);
-          const km = safeNum(r.total_km).toFixed(1);
+        .map((r, idx) => {
+          try {
+            const ts = asDate(r.timestamp) || asDate(r.report_date);
+            const km = safeNum(r.total_km).toFixed(1); // стабильный вариант
 
-          // shift берем как есть
-          const shiftText =
-            typeof r.shift === "string" || typeof r.shift === "number"
-              ? String(r.shift).trim()
-              : "";
-          const shiftPart = shiftText ? ` • ${esc(shiftText)}` : "";
+            // shift берём как есть
+            const shiftText =
+              typeof r.shift === "string" || typeof r.shift === "number"
+                ? String(r.shift).trim()
+                : "";
+            const shiftPart = shiftText ? ` • ${esc(shiftText)}` : "";
 
-          // километры — сразу после shift
-          const kmPart = ` • ${esc(km)} km`;
+            // километры — сразу после shift
+            const kmPart = ` • ${esc(km)} km`;
 
-          // sequence_names: поддерживаем \n и старые разделители (">" и " - ")
-          let seqBlock = "";
-          if (r.sequence_names) {
-            let text = String(r.sequence_names || "").trim();
-            if (!text.includes("\n")) {
-              text = text
-                .split(/>| - /)
-                .map((s) => s.trim())
-                .filter(Boolean)
-                .join("\n");
+            // sequence_names: перенос на новые строки
+            let seqBlock = "";
+            if (r.sequence_names) {
+              const text = normalizeSeq(r.sequence_names);
+              if (text) {
+                seqBlock = `<div class="meta" style="margin-top:8px; white-space:pre-line;">${esc(
+                  text
+                )}</div>`;
+              }
             }
-            seqBlock = `<div class="meta" style="margin-top:8px; white-space:pre-line;">${esc(
-              text
-            )}</div>`;
-          }
 
-          return `
+            return `
               <article class="card" role="listitem" aria-label="Report">
                 <h3>${esc(r.driver_name || "—")} • Route ${esc(
-            r.route || "—"
-          )}${shiftPart}${kmPart}</h3>
-                <div class="meta" style="border-bottom:1px solid rgba(0,0,0,0.15);padding-bottom:4px;margin-bottom:8px;">
-  ${fmtAT(ts)}
-</div>
+              r.route || "—"
+            )}${shiftPart}${kmPart}</h3>
+                <div class="meta" style="border-bottom:1px solid rgba(0,0,0,0.15);padding-bottom:4px;margin-bottom:8px;">${fmtAT(
+                  ts
+                )}</div>
                 ${seqBlock}
               </article>
             `;
+          } catch (itemErr) {
+            console.error("Render item failed at index", idx, itemErr, r);
+            // Если одна карточка сломалась — пропускаем её, но не рвём весь список
+            return "";
+          }
         })
         .join("");
     } catch (e) {
