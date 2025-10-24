@@ -157,16 +157,18 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             return `
-  <article class="card" role="listitem" aria-label="Report">
-    <h3>№ ${esc(r.row_num)} • ${esc(dateStr)} • ${esc(
-              shiftTxt || "—"
-            )} • Route ${esc(routeTxt)}</h3>
-    <div class="meta" style="border-bottom:1px solid rgba(0,0,0,0.15);padding-bottom:4px;margin-bottom:8px;">
-      ${esc(r.driver_name || "—")} • ${esc(km)} km
-    </div>
-    ${seqBlock}
-  </article>
-`;
+            <article class="card" role="listitem" aria-label="Report">
+              <h3>${esc(dateStr)} • ${esc(shiftTxt || "—")} • Route ${esc(
+              routeTxt
+            )}</h3>
+              <div class="meta" style="border-bottom:1px solid rgba(0,0,0,0.15);padding-bottom:4px;margin-bottom:8px;">
+                № ${esc(r.row_num)} • ${esc(r.driver_name || "—")} • ${esc(
+              km
+            )} km
+              </div>
+              ${seqBlock}
+            </article>
+          `;
           } catch (err) {
             console.error("Render item failed at index", idx, err, r);
             return "";
