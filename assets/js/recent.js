@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const fFrom = document.getElementById("f_from");
   const fTo = document.getElementById("f_to");
   const fLimit = document.getElementById("f_limit");
-  const fRoute = document.getElementById("f_route"); // 🔹 новый фильтр
+  const fRoute = document.getElementById("f_route"); // фильтр по маршруту
+  const fShift = document.getElementById("f_shift"); // фильтр по времени (Früh/Nachmittag)
   const apply = document.getElementById("apply");
 
   /* ===== часы ===== */
@@ -64,11 +65,22 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("\n");
   }
 
+  // сортировка смен: сначала Nachmittag, затем Früh
   const shiftRank = (s) => {
     const t = String(s || "").toLowerCase();
     if (t.startsWith("nach")) return 0;
     if (t.startsWith("fr")) return 1;
     return 2;
+  };
+
+  // проверка попадания смены под фильтр
+  const matchShift = (value, wanted) => {
+    const w = String(wanted || "").toLowerCase();
+    if (!w) return true; // Alle
+    const t = String(value || "").toLowerCase();
+    if (w.startsWith("fr")) return t.startsWith("fr");
+    if (w.startsWith("nach")) return t.startsWith("nach");
+    return true;
   };
 
   const startOfDay = (d) =>
@@ -83,13 +95,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const from = fFrom.value || "";
       const to = fTo.value || "";
       const limit = Number(fLimit.value) || 50;
-      const routeFilter = fRoute?.value || ""; // 🔹 выбранный маршрут
+      const routeValue = fRoute?.value || ""; // "","1","2",…
+      const shiftValue = fShift?.value || ""; // "","Früh","Nachmittag"
 
       const items = await API.getRecentSubmissions({
         from,
         to,
         limit,
-        route: routeFilter || "",
+        route: routeValue || "",
       });
 
       const fromD = from ? startOfDay(asDate(from)) : null;
@@ -102,19 +115,20 @@ document.addEventListener("DOMContentLoaded", () => {
           if (!d) return false;
           if (fromD && d < fromD) return false;
           if (toD && d > toD) return false;
-          if (routeFilter && String(r.route) !== String(routeFilter))
-            return false; // 🔹 фильтр по Route
+          if (routeValue && String(r.route) !== String(routeValue))
+            return false;
+          if (fShift && !matchShift(r.shift, shiftValue)) return false;
           return true;
         })
         .sort((a, b) => {
           const da = dateOf(a),
             db = dateOf(b);
-          if (db - da !== 0) return db - da;
+          if (db - da !== 0) return db - da; // дата (убыв.)
           const sr = shiftRank(a.shift) - shiftRank(b.shift);
-          if (sr !== 0) return sr;
+          if (sr !== 0) return sr; // смена: N > F
           const ra = Number(a.route) || 9999,
             rb = Number(b.route) || 9999;
-          return ra - rb;
+          return ra - rb; // Route (возр.)
         })
         .slice(0, limit);
 
@@ -128,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
           try {
             const repDate = dateOf(r);
             const dateStr = repDate ? repDate.toLocaleDateString("de-AT") : "—";
-            const shiftText = (r.shift ?? "").toString().trim();
+            const shiftTxt = (r.shift ?? "").toString().trim();
             const km = safeNum(r.total_km).toFixed(1);
             const routeTxt = (r.route ?? "—").toString().trim();
 
@@ -144,9 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             return `
               <article class="card" role="listitem" aria-label="Report">
-                <h3>№ ${esc(r.row_num)} • ${esc(dateStr)} • ${esc(
-              shiftText || "—"
-            )} • Route ${esc(routeTxt)}</h3>
+                <h3>${esc(dateStr)} • ${esc(shiftTxt || "—")} • Route ${esc(
+              routeTxt
+            )}</h3>
                 <div class="meta" style="border-bottom:1px solid rgba(0,0,0,0.15);padding-bottom:4px;margin-bottom:8px;">
                   ${esc(r.driver_name || "—")} • ${esc(km)} km
                 </div>
