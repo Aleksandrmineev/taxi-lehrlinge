@@ -5,9 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const fFrom = document.getElementById("f_from");
   const fTo = document.getElementById("f_to");
   const fLimit = document.getElementById("f_limit");
+  const fRoute = document.getElementById("f_route"); // 🔹 новый фильтр
   const apply = document.getElementById("apply");
 
-  /* ===== часы вверху ===== */
+  /* ===== часы ===== */
   const fmtNow = () =>
     new Date().toLocaleString("de-AT", {
       dateStyle: "medium",
@@ -52,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
 
-  // нормализация списка точек (поддержка \n, ">", " - ")
   function normalizeSeq(v) {
     if (v == null) return "";
     const text = String(v).replace(/\r\n?/g, "\n").trim();
@@ -64,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .join("\n");
   }
 
-  // сортировка смен: сначала Nachmittag, потом Früh, остальное — после
   const shiftRank = (s) => {
     const t = String(s || "").toLowerCase();
     if (t.startsWith("nach")) return 0;
@@ -84,15 +83,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const from = fFrom.value || "";
       const to = fTo.value || "";
       const limit = Number(fLimit.value) || 50;
+      const routeFilter = fRoute?.value || ""; // 🔹 выбранный маршрут
 
       const items = await API.getRecentSubmissions({
         from,
         to,
         limit,
-        route: "",
+        route: routeFilter || "",
       });
 
-      // локальная фильтрация + сортировка: дата ↓, затем shift, затем Route ↑
       const fromD = from ? startOfDay(asDate(from)) : null;
       const toD = to ? endOfDay(asDate(to)) : null;
       const dateOf = (r) => asDate(r.report_date) || asDate(r.timestamp);
@@ -103,16 +102,18 @@ document.addEventListener("DOMContentLoaded", () => {
           if (!d) return false;
           if (fromD && d < fromD) return false;
           if (toD && d > toD) return false;
+          if (routeFilter && String(r.route) !== String(routeFilter))
+            return false; // 🔹 фильтр по Route
           return true;
         })
         .sort((a, b) => {
           const da = dateOf(a),
             db = dateOf(b);
-          if (db - da !== 0) return db - da; // дата (убыв.)
+          if (db - da !== 0) return db - da;
           const sr = shiftRank(a.shift) - shiftRank(b.shift);
-          if (sr !== 0) return sr; // смена
+          if (sr !== 0) return sr;
           const ra = Number(a.route) || 9999,
-            rb = Number(b.route) || 9999; // Route (возр.)
+            rb = Number(b.route) || 9999;
           return ra - rb;
         })
         .slice(0, limit);
@@ -143,17 +144,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             return `
               <article class="card" role="listitem" aria-label="Report">
-                <h3>${esc(dateStr)} • ${esc(shiftText || "—")} • Route ${esc(
-              routeTxt
-            )}</h3>
+                <h3>№ ${esc(r.row_num)} • ${esc(dateStr)} • ${esc(
+              shiftText || "—"
+            )} • Route ${esc(routeTxt)}</h3>
                 <div class="meta" style="border-bottom:1px solid rgba(0,0,0,0.15);padding-bottom:4px;margin-bottom:8px;">
                   ${esc(r.driver_name || "—")} • ${esc(km)} km
                 </div>
                 ${seqBlock}
               </article>
             `;
-          } catch (itemErr) {
-            console.error("Render item failed at index", idx, itemErr, r);
+          } catch (err) {
+            console.error("Render item failed at index", idx, err, r);
             return "";
           }
         })
