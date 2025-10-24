@@ -1,5 +1,5 @@
 // assets/js/recent.js
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   const listEl = document.getElementById("list") || document.body;
   const nowEl = document.getElementById("now");
   const fFrom = document.getElementById("f_from");
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!fFrom.value) fFrom.value = toISO(yest);
   if (!fTo.value) fTo.value = toISO(today);
 
-  /* ===== хелперы ===== */
+  /* ===== helpers ===== */
   const safeNum = (v) => {
     if (typeof v === "number") return v;
     if (typeof v === "string") return Number(v.replace(",", ".")) || 0;
@@ -37,16 +37,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   const asDate = (v) => {
     if (v == null || v === "") return null;
+    if (v instanceof Date) return v;
     if (typeof v === "number") return new Date(v);
     const n = Number(v);
     if (!Number.isNaN(n)) return new Date(n);
     const d = new Date(v);
     return isNaN(d) ? null : d;
   };
-  const fmtAT = (d) =>
-    d
-      ? d.toLocaleString("de-AT", { dateStyle: "medium", timeStyle: "short" })
-      : "—";
   const esc = (s) =>
     String(s ?? "")
       .replace(/&/g, "&amp;")
@@ -55,17 +52,30 @@ document.addEventListener("DOMContentLoaded", async () => {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
 
-  // Универсальная нормализация маршрута (поддержка \n, ">", " - ")
+  // нормализация списка точек (поддержка \n, ">", " - ")
   function normalizeSeq(v) {
     if (v == null) return "";
     const text = String(v).replace(/\r\n?/g, "\n").trim();
-    if (text.includes("\n")) return text; // уже новый формат
+    if (text.includes("\n")) return text;
     return text
       .split(/(?:\s*>\s*|\s*-\s*)+/)
       .map((s) => s.trim())
       .filter(Boolean)
       .join("\n");
   }
+
+  // сортировка смен: сначала Nachmittag, потом Früh, остальное — после
+  const shiftRank = (s) => {
+    const t = String(s || "").toLowerCase();
+    if (t.startsWith("nach")) return 0;
+    if (t.startsWith("fr")) return 1;
+    return 2;
+  };
+
+  const startOfDay = (d) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const endOfDay = (d) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
 
   /* ===== загрузка и рендер ===== */
   async function loadAndRender() {
@@ -82,28 +92,45 @@ document.addEventListener("DOMContentLoaded", async () => {
         route: "",
       });
 
-      if (!Array.isArray(items) || items.length === 0) {
+      // локальная фильтрация + сортировка: дата ↓, затем shift, затем Route ↑
+      const fromD = from ? startOfDay(asDate(from)) : null;
+      const toD = to ? endOfDay(asDate(to)) : null;
+      const dateOf = (r) => asDate(r.report_date) || asDate(r.timestamp);
+
+      const rows = (Array.isArray(items) ? items : [])
+        .filter((r) => {
+          const d = dateOf(r);
+          if (!d) return false;
+          if (fromD && d < fromD) return false;
+          if (toD && d > toD) return false;
+          return true;
+        })
+        .sort((a, b) => {
+          const da = dateOf(a),
+            db = dateOf(b);
+          if (db - da !== 0) return db - da; // дата (убыв.)
+          const sr = shiftRank(a.shift) - shiftRank(b.shift);
+          if (sr !== 0) return sr; // смена
+          const ra = Number(a.route) || 9999,
+            rb = Number(b.route) || 9999; // Route (возр.)
+          return ra - rb;
+        })
+        .slice(0, limit);
+
+      if (!rows.length) {
         listEl.innerHTML = '<p style="opacity:.7">Keine Einträge</p>';
         return;
       }
 
-      listEl.innerHTML = items
+      listEl.innerHTML = rows
         .map((r, idx) => {
           try {
-            const ts = asDate(r.timestamp) || asDate(r.report_date);
-            const km = safeNum(r.total_km).toFixed(1); // стабильный вариант
+            const repDate = dateOf(r);
+            const dateStr = repDate ? repDate.toLocaleDateString("de-AT") : "—";
+            const shiftText = (r.shift ?? "").toString().trim();
+            const km = safeNum(r.total_km).toFixed(1);
+            const routeTxt = (r.route ?? "—").toString().trim();
 
-            // shift берём как есть
-            const shiftText =
-              typeof r.shift === "string" || typeof r.shift === "number"
-                ? String(r.shift).trim()
-                : "";
-            const shiftPart = shiftText ? ` • ${esc(shiftText)}` : "";
-
-            // километры — сразу после shift
-            const kmPart = ` • ${esc(km)} km`;
-
-            // sequence_names: перенос на новые строки
             let seqBlock = "";
             if (r.sequence_names) {
               const text = normalizeSeq(r.sequence_names);
@@ -116,18 +143,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             return `
               <article class="card" role="listitem" aria-label="Report">
-                <h3>${esc(r.driver_name || "—")} • Route ${esc(
-              r.route || "—"
-            )}${shiftPart}${kmPart}</h3>
-                <div class="meta" style="border-bottom:1px solid rgba(0,0,0,0.15);padding-bottom:4px;margin-bottom:8px;">${fmtAT(
-                  ts
-                )}</div>
+                <h3>${esc(dateStr)} • ${esc(shiftText || "—")} • Route ${esc(
+              routeTxt
+            )}</h3>
+                <div class="meta" style="border-bottom:1px solid rgba(0,0,0,0.15);padding-bottom:4px;margin-bottom:8px;">
+                  ${esc(r.driver_name || "—")} • ${esc(km)} km
+                </div>
                 ${seqBlock}
               </article>
             `;
           } catch (itemErr) {
             console.error("Render item failed at index", idx, itemErr, r);
-            // Если одна карточка сломалась — пропускаем её, но не рвём весь список
             return "";
           }
         })
@@ -139,7 +165,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   apply.addEventListener("click", loadAndRender);
-
-  // первая загрузка
   loadAndRender();
 });
